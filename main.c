@@ -1,152 +1,167 @@
-#include <conio.h>
 #include <stdio.h>
+#include <stdlib.h>
+#define NMAX 100
 
-#include <unistd.h>
+int inputNum(int *a);
 
-#define max_y 25
-#define max_x 80
+int inputValues(int **a, int c, int r, int n);
 
-#define max_length_rocket 3
+void output(int **a, int c, int r, int n);
 
+int sum (int **a, int stc, int c, int n);
 
+void margeArr(int **a, int str1, int str2, int c, int n);
 
-void clrscr(void)
-{
-//char a[80];
-//    printf("\e[1;1H\e[2J");
-//printf("\033[2J"); /* Clear the entire screen. */
-//printf("\033[0;0f\n"); /* Move cursor to the top left hand corner
-
-}
-
-//void cross_and_toe_display(int cross_pos, int toe_pos);
-
-struct movable_element{
-    int x, y;
-    int length;
-} l_pl, r_pl, ball;
-
-
-
-void display(char* screen){
-    clrscr();
-    usleep(100000);
-    printf("%s", screen);
-}
-
-
-void input()
-{
-    char c = '\0';
-    while(kbhit()) {
-        c = getch();
-/*        printf(" %d - %c\n", c, c);
-        sleep(1);*///97        65
-        if ((int)c == 97 || (int)c == 65)
-            if (l_pl.y > 1) l_pl.y--;
-//                122        90
-        if (c == 'z' || c == 'Z')
-            if (l_pl.y < max_y - l_pl.length - 1) l_pl.y++;
-//                107        75
-        if (c == 'k' || c == 'K')
-            if (r_pl.y > 1) r_pl.y--;
-//                109        77
-        if (c == 'm' || c == 'M')
-            if (r_pl.y < max_y - r_pl.length - 1) r_pl.y++;
-
-    }
-}
-
-int paint_rocket(int x, int y){
-    if (x == l_pl.x && ( y < (l_pl.y + l_pl.length) && y >= l_pl.y))
-          return 1;
-    if (x == r_pl.x && ( y < (r_pl.y + r_pl.length) && y >= r_pl.y))
-          return 1;
-    return 0;
-
-}
-
+void sort(int **a, int r, int c, int n);
 
 
 int main() {
+//  int data[NMAX][NMAX];
+  int n, R, C, flag = 0;
+  int *lPtr = 0;
+  int **bPtr = 0;
+  if (inputNum(&n) || n > 3)
+    flag = 2;
 
-    l_pl.x = 2;
-    r_pl.x = max_x - 3;
-    l_pl.y = r_pl.y = ball.y= max_y/2;
-    l_pl.length = r_pl.length = 3;
-    ball.x = max_x/2;
-    ball.length = 1;
+  if (inputNum(&R) || inputNum(&C))
+    flag = 2;
 
-    // У мячика ball элемент length будет работать как направление движения
-    //
-    //         0
-    //         ↑
-    //    3 ←  @  → 1             - это мячик и значения length в зависимости он направления движенияы
-    //         ↓
-    //         2
-    char screen[25][81];
-//    int cross_position, toe_position;
-//    printf("Enter the \"X\" and \"O\" position:");
+  if (!flag) {
+    switch (n) {
+//    case 1:
+//      bPtr = (int **)data;
+//      break;
+    case 1:
+      bPtr = malloc(R * C * sizeof(int) + R * sizeof(int *));
+      lPtr = (int *)(bPtr + R);
+      for (int i = 0; i < R; ++i)
+        bPtr[i] = lPtr + C * i;
+      break;
+    case 2:
+      bPtr = malloc(R * sizeof(int *));
+      for (int i = 0; i < R; ++i)
+        bPtr[i] = malloc(C * sizeof(int));
+      break;
+    case 3:
+      bPtr = malloc(R * sizeof(int *));
+      lPtr = malloc(R * C * sizeof(int));
+      for (int i = 0; i < R; ++i)
+        bPtr[i] = lPtr + C * i;
+      break;
 
-//    if (scanf("%d%d", &cross_position, &toe_position) != 2 || cross_position < 0 || toe_position < 0) {
-//        printf("Invalid position");
-//        return -1;
-//    }
-
-    for (int i = 0; i < 25; i++)
-        for(int j = 0; j < 81; j++) {
-            if (j == 80)
-                screen[i][j] = '\n';
-            else if(j == 79 || j == 0)
-                screen[i][j] = '|';
-            else if(i == 0 || i == 24)
-                screen[i][j] = '-';
-            else if(paint_rocket(j, i))
-                screen[i][j] = '!';
-            else
-                screen[i][j] = ' ';
-//            screen[i][j] = paint_rocket(j, i);
-        }
-
-int k = 0;
-    while (1) {
-        input();
-        for (int i = 0; i < 25; i++)
-            for(int j = 0; j < 81; j++) {
-                if (j == 80)
-                    screen[i][j] = '\n';
-                else if(j == 79 || j == 0)
-                    screen[i][j] = '|';
-                else if(i == 0 || i == 24)
-                    screen[i][j] = '-';
-                else if(paint_rocket(j, i))
-                    screen[i][j] = '!';
-                else
-                    screen[i][j] = ' ';
-    //            screen[i][j] = paint_rocket(j, i);
-            }
-        display(screen);
-        printf("%d L_P  %d %d    R_P  %d %d\n", k++, l_pl.x, l_pl.y, r_pl.x, r_pl.y);
+    default:
+      flag = 2;
     }
+  }
 
-//    cross_and_toe_display(cross_position, toe_position);
+  if ((!flag) && inputValues(bPtr, C, R, n))
+    flag = 1;
+  if (!flag) {
+    sort(bPtr, R, C, n);
+
+    output(bPtr, C, R, n);
+
+  }
+  if (flag < 2) {
+    switch (n) {
+    case 1:
+      free(bPtr);
+      break;
+    case 2:
+      for (int i = 0; i < R; ++i)
+        free(bPtr[i]);
+      free(bPtr);
+      break;
+    case 3:
+      free(lPtr);
+      free(bPtr);
+      break;
+    }
+  }
+
+  if (flag) {
+    printf("n/a");
+  }
+  return flag;
+}
+
+int inputNum(int *n) {
+  int flag = 0;
+  if (scanf("%d", n) != 1 || *n < 1) {
+    flag = 1;
+  }
+  return flag;
+}
+
+int inputValues(int **a, int c, int r, int n) {
+  int flag = 0;
+  float s;
+  for (int i = 0; i < r; ++i)
+    for (int j = 0; j < c; ++j) {
+      if ((!flag && !scanf("%f", &s)) || (s != (int)s)) {
+        flag = 1;
+      } else {
+        if (n == 1 || n == 3)
+          *((int *)a + i * c + j) = (int)s;
+        if (n == 2)
+          a[i][j] = (int)s;
+      }
+    }
+  return flag;
+}
+
+void output(int **a, int c, int r, int n) {
+  for (int i = 0; i < r; ++i) {
+    for (int j = 0; j < c; ++j) {
+      if ((i == r - 1) && (j == c - 1))
+        printf("%d", (n == 1 || n == 3) ? *((int *)a + i * c + j) : a[i][j]);
+      else
+        printf("%d ", (n == 1 || n == 3) ? *((int *)a + i * c + j) : a[i][j]);
+    }
+    printf("\n");
+  }
 }
 
 
-
-
-void cross_and_toe_display(int cross_pos, int toe_pos) {
-    char cross = 'X';
-    char toe = '0';
-    char space = ' ';
-    int max_pos = (cross_pos > toe_pos) ? cross_pos : toe_pos;
-    for (int i = 0; i <= max_pos; i++) {
-        if (i == cross_pos) {
-            printf("%c", cross);
-        } else if (i == toe_pos) {
-            printf("%c", toe);
-        } else {
-            printf("%c", space);
-        }
-    }
+int sum (int **a, int str, int c, int n){
+    int sum = 0;
+    for (int i = 0; i < c; ++i)
+      sum += (n == 1 || n == 3) ? *((int *)a + c * str + i) : a[str][i];
+    return sum;
 }
+
+
+void margeArr(int **a, int str1, int str2, int c, int n){
+    int tmp1[c];
+    int tmp2[c];
+    for (int i = 0; i < c; ++i) {
+      tmp1[i] = (n == 1 || n == 3) ? *((int *)a + c * str1 + i) : a[str1][i];
+      (tmp2[i] = (n == 1 || n == 3) ? *((int *)a + c * str2 + i) : a[str2][i]);
+    }
+    for (int i = 0; i < c; ++i)
+        if (n == 1 || n == 3)
+            *((int *)a + c * str1 + i) = tmp2[i];
+        else
+            a[str1][i] = tmp2[i];
+
+    for (int i = 0; i < c; ++i)
+        if (n == 1 || n == 3)
+            *((int *)a + c * str2 + i) = tmp1[i];
+        else
+            a[str2][i] = tmp1[i];
+
+//printf("\n = /n");
+}
+
+void sort(int **a, int r, int c, int n) {
+  for (int i = 0; i < r - 1; ++i) {
+    for (int j = 0; j < r - i - 1; ++j) {
+      if (sum(&a[0], j, c, n) > sum(&a[0], j + 1, c, n)) {
+
+          margeArr(&a[0], j, j+1, c, n);
+
+      }
+    }
+  }
+}
+
