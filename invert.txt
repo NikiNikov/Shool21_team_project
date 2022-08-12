@@ -1,0 +1,289 @@
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#define NMAX 100
+
+double det(double **matrix, int n);
+
+void invert(double **matrix, int c, int r);
+
+int inputNum(int *a);
+
+int inputValues(double **a, int c, int r);
+
+void output(double **a, int c, int r);
+
+
+int main() {
+  int R, C, flag = 0;
+  double **bPtr = 0;
+
+  if (inputNum(&R) || inputNum(&C) || R != C)
+    flag = 2;
+
+  if (!flag) {
+
+      bPtr = malloc(3 * sizeof(double *));
+       for (int i = 0; i < R; ++i) {
+            bPtr[i] = malloc(R * sizeof(double));
+
+       }
+//       bPtr = malloc(R * sizeof(int *));
+//      for (int i = 0; i < R; ++i)
+//        bPtr[i] = malloc(C * sizeof(int));
+
+//      bPtrN = malloc(R * sizeof(int *));
+//      for (int i = 0; i < R; ++i)
+//        bPtrN[i] = malloc(C * sizeof(int));
+
+
+  }
+
+  if ((!flag) && inputValues(bPtr, C, R))
+    flag = 1;
+  if (!flag) {
+
+
+
+    invert(bPtr, C, R);
+    output(bPtr, C, R);
+
+
+  }
+    if (flag < 2) {
+        for (int i = 0; i < R; ++i)
+          free(bPtr[i]);
+        free(bPtr);
+
+    }
+
+
+  if (flag) {
+    printf("n/a");
+  }
+  return flag;
+}
+
+int inputNum(int *n) {
+  int flag = 0;
+  if (scanf("%d", n) != 1 || *n < 1) {
+    flag = 1;
+  }
+  return flag;
+}
+
+int inputValues(double **a, int c, int r) {
+  int flag = 0;
+  float s;
+  for (int i = 0; i < r; ++i)
+    for (int j = 0; j < c; ++j) {
+      if ((!flag && !scanf("%f", &s)) /*|| (s != (int)s)*/) {
+        flag = 1;
+      } else {
+          a[i][j] = /*(int)*/s;
+      }
+    }
+  return flag;
+}
+
+void output(double **a, int c, int r) {
+  for (int i = 0; i < r; ++i) {
+    for (int j = 0; j < c; ++j) {
+      if (j == c - 1)
+        printf("%f",  a[i][j]);
+      else
+        printf("%f ", a[i][j]);
+    }
+    if (i < r - 1)
+        printf("\n");
+  }
+}
+
+
+void perepis(double **in, double **out, int n, int i, int j){
+    int x, y;
+    for (int p = 0; p < n; ++p) {
+      for (int k = 0; k < n; ++k) {
+          x = p;
+          y = k;
+          if (p == i || j == k)
+              continue;
+    if (p > i) x--;
+    if (k > j) y--;
+    in[x][y] = out[p][k];
+//    printf("%d %d | %d %d | %f\n",x, y, p, k, out[p][k]);
+
+      }
+    }
+
+    output(in, n-1, n - 1);
+    printf("\n");
+    printf("\n");
+    output(out, n, n);
+    printf("\n");
+    printf("\n");
+}
+
+
+
+void find_minor(double **matrix, double **minor, int n) {
+    printf("start\n");
+    if (n == 2)
+    {  double tmp = minor[0][0];
+        printf("2start\n");
+        minor[0][0] = minor[1][1];
+        minor[1][1] = tmp;
+        tmp = minor[1][0];
+        minor[1][0] = minor[0][1];
+        minor[0][1] = tmp;
+    }
+    else if(n == 1)
+    {
+        printf("1start\n");
+    }
+    else {
+        printf("else start\n");
+
+        double **miniMtrx = (double**)calloc (n-1, sizeof (double*));
+        for (int i = 0; i < n - 1; ++i)
+            miniMtrx[i] = (double*)calloc(n - 1, sizeof(double));
+
+        printf("vbldeleno\n");
+        for (int i = 0; i < n; ++i) {
+          for (int j = 0; j < n; ++j) {
+
+              perepis( minor,matrix, n, i, j);
+              // Переписать в miniMtrx
+
+              minor[i][j] = det(miniMtrx, n - 1);
+          }
+        }
+
+
+
+
+              for (int i = 0; i < n * 2; ++i)
+                free(miniMtrx[i]);
+              free(miniMtrx);
+    }
+
+
+
+
+}
+
+
+void invert(double **matrix, int c, int r){
+
+    int n, flag = 0;
+    n = r;
+    double d;
+
+    printf("start\n");
+    double **minorMtrx = (double**)calloc (n, sizeof (double*));
+    for (int i = 0; i < n; ++i)
+        minorMtrx[i] = (double*)calloc(n, sizeof(double));
+
+   if (c != r) {
+       printf("ppc\n");
+       flag = 1;
+   }
+
+       d = det(matrix, n);
+       printf(" %f <-\n", d);
+       if (fabs(d) < pow(10,-6))
+           flag = 2;
+
+    if (!flag){
+        printf("norm\n");
+       find_minor(matrix, minorMtrx, n);
+       printf("good\n");
+       output(minorMtrx, n, n);
+
+
+     }
+
+
+
+
+   for (int i = 0; i < n * 2; ++i)
+     free(minorMtrx[i]);
+   free(minorMtrx);
+}
+
+
+void getMatrixWithoutRowAndCol(double **matrix, int size, int row, int col, double **newMatrix) {
+              int offsetRow = 0; //Смещение индекса строки в матрице
+              int offsetCol = 0; //Смещение индекса столбца в матрице
+              for(int i = 0; i < size-1; i++) {
+                  //Пропустить row-ую строку
+                  if(i == row) {
+                      offsetRow = 1; //Как только встретили строку, которую надо пропустить, делаем смещение для исходной матрицы
+                  }
+
+                  offsetCol = 0; //Обнулить смещение столбца
+                  for(int j = 0; j < size-1; j++) {
+                      //Пропустить col-ый столбец
+                      if(j == col) {
+                          offsetCol = 1; //Встретили нужный столбец, проускаем его смещением
+                      }
+
+                      newMatrix[i][j] = matrix[i + offsetRow][j + offsetCol];
+                  }
+              }
+          }
+
+
+
+          //Вычисление определителя матрицы разложение по первой строке
+          double det(double **matrix, int size) {
+              int Det = 0;
+              int degree = 1; // (-1)^(1+j) из формулы определителя
+
+              //Условие выхода из рекурсии
+              if(size == 1) {
+                  return matrix[0][0];
+              }
+              //Условие выхода из рекурсии
+              else if(size == 2) {
+                  return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+              }
+              else {
+                  //Матрица без строки и столбца
+                  double **newMatrix = (double**)calloc(size-1, sizeof(double *));
+                  for (int i = 0; i < size-1; ++i) {
+                      newMatrix[i] = (double*)calloc(size-1, sizeof(double));
+//
+//                     int **newMatrix = new double*[size-1];
+//                     for(int i = 0; i < size-1; i++) {
+//                         newMatrix[i] = new int[size-1];
+//
+                  }
+
+                  //Раскладываем по 0-ой строке, цикл бежит по столбцам
+                  for(int j = 0; j < size; j++) {
+                      //Удалить из матрицы i-ю строку и j-ый столбец
+                      //Результат в newMatrix
+                      getMatrixWithoutRowAndCol(matrix, size, 0, j, newMatrix);
+
+                      //Рекурсивный вызов
+                      //По формуле: сумма по j, (-1)^(1+j) * matrix[0][j] * minor_j (это и есть сумма из формулы)
+                      //где minor_j - дополнительный минор элемента matrix[0][j]
+                      // (напомню, что минор это определитель матрицы без 0-ой строки и j-го столбца)
+                      Det = Det + (degree * matrix[0][j] * det(newMatrix, size-1));
+                      //"Накручиваем" степень множителя
+                      degree = -degree;
+                  }
+
+                  //Чистим память на каждом шаге рекурсии(важно!)
+                  for(int i = 0; i < size-1; i++) {
+                      free( newMatrix[i]);
+                  }
+                  free(newMatrix);
+              }
+
+              return Det;
+          }
+
+
+
