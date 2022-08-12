@@ -1,0 +1,183 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define NMAX 100
+
+int inputNum(int *a);
+
+int inputValues(int **a, int c, int r);
+
+void output(int **a, int c, int r);
+
+void sort(int *a, int n);
+/*
+    1 6 7
+    2 5 8
+    3 4 9
+*/
+void sort_vertical(int **matrix, int c, int r, int **result_matrix);
+
+/*
+    1 2 3
+    6 5 4
+    7 8 9
+*/
+void sort_horizontal(int **matrix, int c, int r, int **result_matrix);
+
+
+
+int main() {
+//  int data[NMAX][NMAX];
+  int R, C, flag = 0;
+  int ***bPtr = 0;
+//  int **bPtrN = 0;
+//  if (inputNum(&n) || n > 3)
+//    flag = 2;
+
+  if (inputNum(&R) || inputNum(&C))
+    flag = 2;
+
+  if (!flag) {
+
+            bPtr = malloc(3 * sizeof(int **));
+            for (int j = 0; j < 3; ++j) {
+                bPtr[j] = malloc(R * sizeof(int *));
+                for (int i = 0; i < R; ++i)
+                  bPtr[j][i] = malloc(C * sizeof(int));
+       }
+  }
+//       bPtr = malloc(R * sizeof(int *));
+//      for (int i = 0; i < R; ++i)
+//        bPtr[i] = malloc(C * sizeof(int));
+
+//      bPtrN = malloc(R * sizeof(int *));
+//      for (int i = 0; i < R; ++i)
+//        bPtrN[i] = malloc(C * sizeof(int));
+
+
+
+
+  if ((!flag) &&  inputValues(bPtr[0], C, R)) flag = 1;
+  if (!flag) {
+//    sort(bPtr, R, C, n);
+
+
+      sort_vertical(bPtr[0], C, R, bPtr[1]);
+      sort_horizontal(bPtr[0], C, R, bPtr[2]);
+      output(bPtr[1], C, R);
+      printf("\n\n");
+      output(bPtr[2], C, R);
+
+  }
+  if (flag < 2) {
+
+      for (int i = 0; i < R; ++i)
+        free(bPtr[i]);
+      free(bPtr);
+
+  }
+
+  if (flag) {
+    printf("n/a");
+  }
+  return flag;
+}
+
+int inputNum(int *n) {
+  int flag = 0;
+  if (scanf("%d", n) != 1 || *n < 1) {
+    flag = 1;
+  }
+  return flag;
+}
+
+int inputValues(int **a, int c, int r) {
+  int flag = 0;
+  float s;
+  for (int i = 0; i < r; ++i)
+    for (int j = 0; j < c; ++j) {
+      if ((!flag && !scanf("%f", &s)) || (s != (int)s)) {
+        flag = 1;
+      } else {
+          a[i][j] = (int)s;
+      }
+    }
+  return flag;
+}
+
+void output(int **a, int c, int r) {
+  for (int i = 0; i < r; ++i) {
+    for (int j = 0; j < c; ++j) {
+      if  (j == c - 1)
+        printf("%d",  a[i][j]);
+      else
+        printf("%d ", a[i][j]);
+    }
+    if (i < r - 1)
+    printf("\n");
+  }
+}
+
+
+
+void sort(int *a, int n) {
+  int tmp;
+  for (int i = 0; i < n - 1; ++i) {
+    for (int j = 0; j < n - i - 1; ++j) {
+      if (a[j] > a[j + 1]) {
+        tmp = a[j];
+        a[j] = a[j + 1];
+        a[j + 1] = tmp;
+      }
+    }
+  }
+}
+
+
+void sort_horizontal(int **matrix, int c, int r, int **result_matrix) {
+
+    int *sortMtrx = (int*)calloc(c * r, sizeof(int));
+
+    for (int i = 0; i < r; ++i)
+      for (int j = 0; j < c; ++j){
+          *(sortMtrx + i * c + j) = matrix[i][j];
+      }
+
+    sort(sortMtrx, c * r);
+
+//    for (int i = 0; i < r; ++i) {
+//      for (int j = 0; j < c; ++j){
+//          printf("%d ", *(sortMtrx + i * c + j));
+//      }
+//      printf("\n");
+//    }
+
+    for (int i = 0; i < r; ++i)
+      for (int j = 0; j < c; ++j){
+          result_matrix[i][j] = *(sortMtrx + i * c + j * ((i+1) % 2) +  (c - j - 1) * (i % 2 ) )/**(sortMtrx + ((i - 1) * c + j) * (i % 2) + (i * c + 1 - j) * ((i + 1) % 2))*/;
+      }
+
+
+    free(sortMtrx);
+}
+
+void sort_vertical(int **matrix, int c, int r, int **result_matrix) {
+
+    int *sortMtrx = (int*)calloc(c * r, sizeof(int));
+
+    for (int i = 0; i < r; ++i)
+      for (int j = 0; j < c; ++j){
+          *(sortMtrx + i * c + j) = matrix[i][j];
+      }
+
+    sort(sortMtrx, c * r);
+
+    for (int i = 0; i < c; ++i)
+      for (int j = 0; j < r; ++j){
+          result_matrix[j][i] = *(sortMtrx + i * r + j * ((i + 1) % 2) +  (r - j -1) * (i%2));
+      }
+
+
+    free(sortMtrx);
+}
+
+
