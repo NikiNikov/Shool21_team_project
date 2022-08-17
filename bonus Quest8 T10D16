@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int len(char *c, int n, int start, int do_konca_stroki) {
+    int length = 0;
+
+    for(int i = start; i < n && c[i] != ' '; ++i)
+        length++;
+//    printf("\n poscital -> %d | do konca -> %d || start - %d  %c%c\n", length, do_konca_stroki, start, c[start], c[start+1]);
+    return length;
+}
+
+int main (int argc, char *argv[]) {
+
+    char a[10];
+    char c[100];
+    int p = 0, lenWord;
+    int n, nach_vivod = 0, do_konca_stroki = 0, flag = 1;
+
+//    if (argc == 2) {
+//        if (argv[1][0] == '-' && argv[1][1] == 'w')
+//            flag = 0;
+//    }
+    flag = 0;
+
+    if (!flag) {
+        scanf("%d ", &n);
+        if (n > 100)
+            flag = 1;
+    }
+
+    while (!flag && scanf("%c", &c[p]) == 1 && ((int)c[p] != 13 && (int)c[p] != 10)) {
+//        printf("%c - %d\n", c[p], (int)c[p]);
+        p++;
+    }
+
+    if (!flag) {
+
+        do_konca_stroki = n;
+        for (int i = 0; i < p; ++i) {
+            if (len(c, p, i, do_konca_stroki) == 0 && i+1 < p && len(c, p, i+1, do_konca_stroki) > do_konca_stroki-1 && len(c, p, i+1, do_konca_stroki) <= n && i) {
+                printf("\\n\n");
+            do_konca_stroki = n;
+            }
+            while (i < p && i+1 < p && c[i] == ' ' && c[i + 1] == ' ') i++;
+            if (c[i] == ' ' && do_konca_stroki == 1) {
+                  do_konca_stroki = n;
+                printf("\\n\n");
+                  continue;
+            }
+            if (c[i] == ' ' && do_konca_stroki ==n)
+                continue;
+            if (len(c, p, i, do_konca_stroki) > 1 && do_konca_stroki == 1){
+                printf("-");
+                do_konca_stroki--;
+            }
+            if (do_konca_stroki == 0){
+                do_konca_stroki = n;
+                printf("\\n\n");
+            }
+            printf("%c", c[i]);
+            do_konca_stroki--;
+        }
+
+    }
+
+    if (flag) {
+        printf("n/a");
+    }
+    return 0;
+}
