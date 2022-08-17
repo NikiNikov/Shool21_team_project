@@ -1,0 +1,23 @@
+void destroy(struct node* root) {
+    struct node* dlPtr;
+    struct node* PrePtr;
+    printf("-------\n");
+    while (root != 0) {
+        PrePtr = 0;
+        for (dlPtr = root; dlPtr != 0 && dlPtr->next != 0; PrePtr = dlPtr, dlPtr = dlPtr->next);
+        
+        if (dlPtr != 0  && dlPtr->next == 0) {
+            printf("-------  %d \n", dlPtr->door->id);
+//            printf("%d \n", dlPtr->door->id);
+            free(dlPtr);
+            dlPtr = 0;
+            if (PrePtr)
+                PrePtr->next = 0;
+            else
+                root = 0;
+        } else {
+            printf("n/a");
+        }
+    }
+        
+}
