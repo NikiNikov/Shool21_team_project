@@ -1,23 +1,165 @@
-void destroy(struct node* root) {
-    struct node* dlPtr;
-    struct node* PrePtr;
-    printf("-------\n");
-    while (root != 0) {
-        PrePtr = 0;
-        for (dlPtr = root; dlPtr != 0 && dlPtr->next != 0; PrePtr = dlPtr, dlPtr = dlPtr->next);
+//void destroy(struct node* root) {
+//    struct node* dlPtr;
+//    struct node* PrePtr;
+//    printf("-------\n");
+//    while (root != 0) {
+//        PrePtr = 0;
+//        for (dlPtr = root; dlPtr != 0 && dlPtr->next != 0; PrePtr = dlPtr, dlPtr = dlPtr->next);
         
-        if (dlPtr != 0  && dlPtr->next == 0) {
-            printf("-------  %d \n", dlPtr->door->id);
-//            printf("%d \n", dlPtr->door->id);
-            free(dlPtr);
-            dlPtr = 0;
-            if (PrePtr)
-                PrePtr->next = 0;
-            else
-                root = 0;
-        } else {
-            printf("n/a");
-        }
+//        if (dlPtr != 0  && dlPtr->next == 0) {
+//            printf("-------  %d \n", dlPtr->door->id);
+////            printf("%d \n", dlPtr->door->id);
+//            free(dlPtr);
+//            dlPtr = 0;
+//            if (PrePtr)
+//                PrePtr->next = 0;
+//            else
+//                root = 0;
+//        } else {
+//            printf("n/a");
+//        }
+//    }
+        
+//}
+
+
+#include "stack.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+
+//#ifndef SRC_STACK_H_
+//#define SRC_STACK_H_
+
+struct stack {
+    int value;
+    struct stack* next;
+};
+
+//struct stack* init(int init_value); // Инициализация структуры стека на базе int
+//struct stack* push(struct stack* root, int value); // Вставка нового элемента value в стек
+
+//int pop(struct stack* root); // Удаление элемента стека
+
+//void destroy(struct stack* root); // Освобождение памяти, занимаемой структурой стека
+
+//#endif  // SRC_STACK_H_
+
+
+struct stack* init(int init_value) {
+    struct stack *root = 0;
+    root = (struct stack*)malloc((sizeof(struct stack)));
+    root->next = 0;
+    root->value = init_value;
+    return root;
+}
+
+int push(struct stack** root, int lvalue) {
+    if (root && *root) {
+        struct stack* oldPtr = *root;
+//        printf("%d-< niz\n", *root);
+        *root = 0;
+        *root = (struct stack*)malloc((sizeof(struct stack)));
+//        printf("%d-< verh\n", *root);
+        (*root)->next = oldPtr;
+        (*root)->value = lvalue;
     }
-        
+    return root;
+}
+
+int pop(struct stack** root) {
+    int value = -30111;
+    if (root && *root) {
+        value = (*root)->value;
+        struct stack* newPtr = (*root)->next;
+        free(*root);
+        *root = newPtr;
+    }
+    return value;
+}
+
+void destroy(struct stack* root) {
+    struct stack* newPtr;
+    while (root) {
+        newPtr = root->next;
+        free(root);
+        root = newPtr;
+    }
+}
+
+
+#define DOORS_COUNT 15
+#define MAX_ID_SEED 10000
+
+void initialize_doors(int *doors);
+
+char* push_test(struct stack** root, int value, char *result);
+
+char* pop_test(struct stack** root, char *result) ;
+
+int main() {
+
+    char result[13] = {'S', 'U', 'C', 'C', 'E', 'S', 'S', '\0', 'F', 'A', 'I', 'L', '\0'};
+
+    int doors[DOORS_COUNT];
+    initialize_doors(doors);
+
+    struct stack* root = 0;
+    root = init(doors[02]);
+
+    push(&root, doors[1]);
+    push(&root, 5);
+    push(&root, 3);
+    push(&root, 9);
+    printf("%s\n", push_test(&root, doors[1], result));
+    printf("%s\n", push_test(&root, doors[2], result));
+
+
+    printf("%s\n", push_test(0, doors[2], result));
+    printf("%s\n", push_test(&root, 0, result));
+
+
+    printf("%s\n", pop_test(&(root->next->next), result));
+    printf("%s\n", pop_test(0, result));
+    destroy(root);
+
+
+    return 0;
+}
+
+// Doors initialization function
+// ATTENTION!!!
+// DO NOT CHANGE!
+void initialize_doors(int *doors) {
+    srand(time(0));
+
+    int seed = rand() % MAX_ID_SEED;
+    for (int i = 0; i < DOORS_COUNT; i++) {
+        doors[i] = (i + seed) % DOORS_COUNT;
+    }
+}
+
+char* push_test(struct stack** root, int value, char *result) {
+    push(root, value);
+    int k = pop(root);
+//    printf("%d   \n", k);
+    if (root && k == value)
+        return &result[0];
+     else
+         return &result[8];
+}
+
+char* pop_test(struct stack** root, char *result) {
+//    int k = 0;
+    char *answ = NULL;
+
+    int k = pop(root);
+
+    if (k != -30111 && result)
+        answ = result;
+     else
+         answ = (result+8);
+
+    return answ;
 }
