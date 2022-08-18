@@ -1,0 +1,25 @@
+#include <stdio.h>
+
+#include "print_module.h"
+#include <time.h>
+#include <string.h>
+
+char print_char(char ch)
+{
+    return putchar(ch);
+}
+
+void print_log(char (*print) (char), char* message) {
+    time_t rawtime;
+    struct tm * timeinfo;
+    time( &rawtime );
+    timeinfo = localtime ( &rawtime );
+    char str[20];
+    strftime (str, 20, " %H:%M:%S ", timeinfo);
+    char string[100];
+    strcpy(string, Log_prefix);
+    strcat(string, str);
+    strcat(string, message);
+    for (int i = 0; i < 100 && string[i]; ++i)
+        print(string[i]);
+}
