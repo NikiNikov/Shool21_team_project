@@ -1,0 +1,37 @@
+
+typedef struct 		s_btree
+{
+struct s_btree 	*left;
+struct s_btree 	*right;
+int 			item;
+} t_btree;
+
+
+t_btree *bstree_create_node(int item);
+
+void bstree_create_node_test(int value);
+
+
+int main () {
+    bstree_create_node_test(10);
+    printf("\n");
+    bstree_create_node_test(-5);
+    return 0;
+}
+
+void bstree_create_node_test(int value) {
+    t_btree *ptr = bstree_create_node(value);
+    printf("%d", ptr->item);
+
+}
+
+t_btree *bstree_create_node(int item)
+{
+// Выделение памяти под корень дерева
+    t_btree *tmp = malloc(sizeof(t_btree));
+// Присваивание значения ключу
+    tmp -> item = item;
+// Присваивание указателю на левое и правое поддерево значения NULL
+    tmp->left = tmp->right = NULL;
+    return tmp;
+}
