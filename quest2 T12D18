@@ -1,0 +1,60 @@
+#include <stdarg.h>
+#include <time.h>
+#include <stdlib.h>
+
+#include <string.h>
+#include <stdio.h>
+
+#define Documents "Linked lists", "Queues", "Maps", "Binary Trees"
+#define Available_document "Binary Trees"
+#define Documents_count 4
+// ?
+
+
+
+int* check_available_documentation_module(int (*validate) (char*), int document_count, ...);
+
+int validate(char* data);
+
+
+
+int main() {
+
+    int *availability_mask;
+//    print_log(print_char, Module_load_success_message);
+
+    availability_mask = check_available_documentation_module(validate, Documents_count, Documents);
+
+    // Output availability for each document....
+    char *text[] = {Documents};
+
+    for (int i = 0; i < Documents_count; ++i) {
+        printf("[%-15s : %savailable]\n", text[i], availability_mask[i] ? "" : "un");
+
+    }
+    free(availability_mask);
+
+    return 0;
+}
+
+
+//#include "documentation_module.h"
+int* check_available_documentation_module(int (*validate) (char*), int document_count, ...) {
+    va_list(factor);
+    va_start(factor, document_count);
+    int *arr_out = (int*)calloc(document_count, sizeof(int));
+    for (int i = 0; i < document_count; ++i) {
+        arr_out[i] = validate(va_arg(factor, char*));
+    }
+    va_end(factor);
+    return arr_out;
+}
+
+int validate(char* data)
+{
+    int validation_result = !strcmp(data, Available_document);
+    return validation_result;
+}
+
+
+
