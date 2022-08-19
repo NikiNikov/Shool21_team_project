@@ -1,0 +1,80 @@
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+
+typedef struct 		s_btree
+{
+struct s_btree 	*left;
+struct s_btree 	*right;
+int 			item;
+} t_btree;
+
+
+t_btree *bstree_create_node(int item);
+
+void bstree_insert(t_btree *root, int item, int (*cmpf) (int, int));
+
+//void bstree_create_node_test(int value);
+
+int cmpf(int a, int b);
+
+
+int main () {
+//    bstree_create_node_test(10);
+//    printf("\n");
+//    bstree_create_node_test(-5);
+
+
+
+    return 0;
+}
+
+//void bstree_create_node_test(int value) {
+//    t_btree *ptr = bstree_create_node(value);
+//    printf("%d", ptr->item);
+
+//}
+
+int cmpf(int a, int b) {
+    return (a > b) ? 1 : 0;
+}
+
+void bstree_insert(t_btree *root, int item, int (*cmpf) (int, int)) {
+    t_btree *root2 = root, *root3 = NULL;
+// Выделение памяти под узел дерева
+    t_btree *tmp = malloc(sizeof(t_btree));
+// Присваивание значения ключу
+    tmp -> item = item;
+/* Поиск нужной позиции для вставки (руководствуемся правилом
+вставки элементов, см. начало статьи, пункт 3) */
+    while (root2 != NULL)
+    {
+        root3 = root2;
+        if (cmpf(root2 -> item, item))
+            root2 = root2 -> left;
+        else
+            root2 = root2 -> right;
+    }
+/* Присваивание указателю на родителя значения указателя root3
+(указатель root3 был найден выше) */
+//    tmp -> parent = root3;
+// Присваивание указателю на левое и правое поддерево значения NULL
+    tmp -> left = NULL;
+    tmp -> right = NULL;
+/* Вставляем узел в дерево (руководствуемся правилом
+вставки элементов, см. начало статьи, пункт 3) */
+    if (cmpf(root3 -> item, item) ) root3 -> left = tmp;
+    else root3 -> right = tmp;
+}
+
+t_btree *bstree_create_node(int item)
+{
+// Выделение памяти под корень дерева
+    t_btree *tmp = malloc(sizeof(t_btree));
+// Присваивание значения ключу
+    tmp -> item = item;
+// Присваивание указателю на левое и правое поддерево значения NULL
+    tmp->left = tmp->right = NULL;
+    return tmp;
+}
