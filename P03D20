@@ -1,0 +1,113 @@
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_X 81
+#define MAX_Y 25
+
+
+struct alastck {
+   char a[400];
+   int top;
+ };
+
+struct stack {
+   struct stack *next;
+   float top;
+ };
+
+void push(char *x,int i) {
+  struct alastck s;
+  s.top++;
+  s.a[s.top]=x[i];
+}
+
+int pop() {
+   struct alastck s;
+   int temp;
+   temp=s.a[s.top];
+   s.top--;
+   return temp;
+ }
+
+void infixNotationToReversePolishNotation(char *in);
+
+void ReversePolishNotationToValue(char *rpn, float currentValue);
+
+void init_screen(char screen[MAX_Y][MAX_X]);
+
+int main() {
+
+
+    char screen[MAX_Y][MAX_X];
+    init_screen(screen);
+
+return 0;
+}
+
+void infixNotationToReversePolishNotation(char *in) {
+    int y;
+    int len=strlen(in);
+    for(int i=0;i<len;i++)
+      {
+//considering user is entering only the small alphabets 
+
+      if((in[i])>=97&&in[i]<=122)
+        printf("%c",in[i]);
+
+      else
+//if encountering the operator then pushing it into stack
+
+      if(in[i]=='/'||in[i]=='*'||in[i]=='+'||in[i]=='-')
+        {
+        push(in,i);
+        }
+
+      else if(in[i]=='(')
+      continue;
+//When encountering the ')' then popping the operator
+
+      else if (in[i]==')')
+        { while (in[i] != '(') {
+            y = pop();
+            printf("%c", y); 
+          }
+        }
+    }
+}
+
+void ReversePolishNotationToValue(char *rpn, float currentValue) {
+    struct stack stk;
+//    string str = "";
+    // Реализацию стека можно взять из позапрошлой индивидуальной работы (T11D17-0), где было про стек
+
+    for (int i = 0; i < strlen(rpn); ++i) {
+
+        if ((rpn[i] > 47 && rpn[i] < 58) || rpn[i] == 'x') {
+//           ; rpn.push(rpn[i] - 48);
+        } else if ( rpn[i] == '+' || rpn[i] == '-' || rpn[i] == '*' || rpn[i] == '/' || rpn[i] == '^') {
+            float a, b;
+
+            a = stk.top;
+            if (a == 78)
+                a = currentValue;
+            pop(stk);
+            b = stk.top;
+            if (b == 78)
+                a = currentValue;
+            pop(stk);
+
+            if (rpn[i] == '+')
+                a = b + a;
+            else if (rpn == '-')
+                a = b - a;
+            else if (rpn == '*')
+                a = b * a;
+            else if (rpn == '/')
+                a = b / a;
+            else if (rpn == '^')
+                a = pow(b, a);
+            /// Cюда ещё добавим sin() cos() exp()
+        }
+    }
+}
