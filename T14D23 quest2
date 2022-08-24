@@ -1,0 +1,136 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <dirent.h>
+
+typedef struct data {
+    int year;
+    int month;
+    int day;
+    int hour;
+    int minute;
+    int second;
+    int status;
+    int key;
+} s_data;
+
+int sort();
+
+int getFileName(char *fileName);
+int fgetS_data(FILE *in, s_data *info);
+
+int search(char *fileName);
+
+int main() {
+    int flag = 0;
+
+    int a[6][8] = {
+        { 2020, 12, 21, 23, 54, 26, 1, 768 },
+        { 2020, 9, 1, 12, 0, 0, 0, 153 },
+        { 2020, 5, 30, 16, 51, 40, 1, 147 },
+        { 1920, 7, 5, 18, 8, 7, 1, 216 },
+        { 1920, 4, 26, 0, 32, 33, 0, 926 },
+        { 1920, 2, 24, 7, 39, 14, 0, 112 }
+    };
+    FILE *output = NULL;
+    output = fopen("output.txt", "wb");
+
+    if (output == NULL) {
+        printf("Error opening file");
+        exit(-3);
+    }
+    fwrite(a, sizeof(int), 48, output);
+    fclose(output);
+
+    char fileName[FILENAME_MAX];
+
+
+        flag = (getFileName(fileName));
+        if (flag == 2)
+            flag = search(fileName);
+
+        if (flag < -1) {
+            printf("n/a\n");
+            fflush(stdout);
+        }
+    return flag;
+
+}
+
+
+int search(char *fileName) {
+    char c[2];
+    int cint[3];
+    FILE * in;
+    int NOfArrow = -2;
+    int flag = 1;
+    for (int i = 0; i < 8 && flag; ++i) {
+        flag = scanf("%d%c%d%c%d", &cint[0], &c[0], &cint[1], &c[1], &cint[2]);
+        if (c[0] == '.' && c[1] == '.')
+            flag = 0;
+    }
+    if (!flag) {
+        s_data mas;
+        in = fopen(fileName, "rb");
+        if (in) {
+            NOfArrow = 0;
+            while(fgetS_data(in, &mas) && !flag) {
+//                                printf("%d %d %d %d %d %d %d %d\n", mas.year, mas.month, mas.day, mas.hour, mas.minute, mas.second, mas.status, mas.key);
+            NOfArrow++;
+                if ( mas.day == cint[0] && mas.month == cint[1] && mas.year == cint[2]) {
+                    printf("%d\n", mas.key);
+                    flag = 1;
+                }
+        }
+        fclose(in);
+        }
+
+    }
+
+    if (flag == 1 && in && NOfArrow > 0)
+        flag = 0;
+    else
+        flag = -2;
+
+    return flag;
+}
+
+
+int getFileName(char *fileName) {
+    int flag = 2;
+    if (fgets(fileName, FILENAME_MAX, stdin) == NULL) {
+        flag = -2;
+    }
+    else {
+            /* Удаляем символ конца строки */
+            size_t last = strlen(fileName) - 1;
+//        printf("%c- last", fileName[last]);
+            if (fileName[last] == '\n')
+                fileName[last] = '\0';
+
+            /* Здесь можно проанализировать строку */
+    }
+    return flag;
+}
+
+
+int fgetS_data(FILE *in, s_data *info) {
+    int control_sum = 0;
+    int c[8];
+    control_sum = fread(c, sizeof(int), 8, in);
+    if (in && (control_sum == 8) ) {
+//        control_sum = fread(c, sizeof(int), 8, in);
+        info->year = c[0];
+        info->month = c[1];
+        info->day = c[2];
+        info->hour = c[3];
+        info->minute = c[4];
+        info->second = c[5];
+        info->status = c[6];
+        info->key = c[7];
+    }
+    if (control_sum != 8)
+        control_sum = 0;
+    return control_sum;
+}
+
