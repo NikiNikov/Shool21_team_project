@@ -72,6 +72,8 @@ int main() {
             switch ( (int)menu ) {
                 case 0:
                     flag = readBinaryFile(fileName, 1);
+                    if (flag == 0)
+                        flag = -5;
                 break;
                 case 1:
                     flag = sort(fileName/*"output.txt"*/);
@@ -178,29 +180,33 @@ int sort(char *fileName)
     } else {
 
         NumberOfStrings = readBinaryFile(fileName, 0);
+        if (NumberOfStrings == 0)
+            flag = -5;
 
-        for (int i  = 0; i < NumberOfStrings; ++i) {
-            for (int j = NumberOfStrings - 1; j > i; --j) {
-                fseek(in, (j-1) * sizeof(s_data), SEEK_SET);
-                fgetS_data(in, &mas[1]);
-//                printf("\n1 - %d %d %d %d %d %d %d %d      i = %d     j = %d\n", mas[1].year, mas[1].month, mas[1].day, mas[1].hour, mas[1].minute, mas[1].second, mas[1].status, mas[1].key, i, j);
-                fgetS_data(in, &mas[2]);
-//                 printf("2 - %d %d %d %d %d %d %d %d     i = %d     j = %d\n", mas[2].year, mas[2].month, mas[2].day, mas[2].hour, mas[2].minute, mas[2].second, mas[2].status, mas[2].key, i , j);
-                fseek(in, (j-1) * sizeof(s_data), SEEK_SET);
-                if (comparisonS_data(&mas[1], &mas[2]) > 0) {
-//                    printf("==");
-                    fputS_data(in, &mas[2]);
-                    fputS_data(in, &mas[1]);
-                }
+        if (!flag) {
+            for (int i  = 0; i < NumberOfStrings; ++i) {
+                for (int j = NumberOfStrings - 1; j > i; --j) {
+                    fseek(in, (j-1) * sizeof(s_data), SEEK_SET);
+                    fgetS_data(in, &mas[1]);
+    //                printf("\n1 - %d %d %d %d %d %d %d %d      i = %d     j = %d\n", mas[1].year, mas[1].month, mas[1].day, mas[1].hour, mas[1].minute, mas[1].second, mas[1].status, mas[1].key, i, j);
+                    fgetS_data(in, &mas[2]);
+    //                 printf("2 - %d %d %d %d %d %d %d %d     i = %d     j = %d\n", mas[2].year, mas[2].month, mas[2].day, mas[2].hour, mas[2].minute, mas[2].second, mas[2].status, mas[2].key, i , j);
+                    fseek(in, (j-1) * sizeof(s_data), SEEK_SET);
+                    if (comparisonS_data(&mas[1], &mas[2]) > 0) {
+    //                    printf("==");
+                        fputS_data(in, &mas[2]);
+                        fputS_data(in, &mas[1]);
+                    }
+               }
            }
-       }
-       fseek(in, 0, SEEK_SET); // В начало
-//       while(fgetS_data(in, mas)) {
-//            printf("\n%d %d %d %d %d %d %d  %d\n", mas[0].year, mas[0].month, mas[0].day, mas[0].hour, mas[0].minute, mas[0].second, mas[0].status, mas[0].key);
-//       }
-       readBinaryFile(fileName, 1);
-        fclose(in);
-        free (mas);
+           fseek(in, 0, SEEK_SET); // В начало
+    //       while(fgetS_data(in, mas)) {
+    //            printf("\n%d %d %d %d %d %d %d  %d\n", mas[0].year, mas[0].month, mas[0].day, mas[0].hour, mas[0].minute, mas[0].second, mas[0].status, mas[0].key);
+    //       }
+           readBinaryFile(fileName, 1);
+            fclose(in);
+            free (mas);
+        }
     }
     return flag;
 }
