@@ -59,7 +59,11 @@ int main() {
 
     while (flag > -1) {
         flag = (getFileName(fileName)); // 2 при норм работе
-        if (flag != -2) {
+        if (fileName[0] == '-' && fileName[1] == '1') {
+            flag = -1;
+            continue;
+        }
+        if (flag == -2) {
             flag = scanf("%f", &menu);
             if (!flag || menu != (int)menu)
                 flag = -4;
