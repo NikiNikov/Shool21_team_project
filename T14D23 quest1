@@ -1,0 +1,353 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <dirent.h>
+
+typedef struct data {
+    int year;
+    int month;
+    int day;
+    int hour;
+    int minute;
+    int second;
+    int status;
+    int key;
+} s_data;
+
+int sort();
+
+int getFileName(char *fileName);
+
+//void readFromFile(FILE** in, int* count);
+
+int read_n(char *filename);
+
+int fgetS_data(FILE *in, s_data *info);
+
+int readBinaryFile(char *fileName, int printMode);
+
+int fputS_data(FILE *in, s_data *out);
+
+int comparisonS_data(s_data *a, s_data *b);
+
+int addS_data(char *fileName);
+
+int main() {
+    int flag = 0;
+    float menu;
+
+    int a[6][8] = {
+        { 2020, 12, 21, 23, 54, 26, 1, 768 },
+        { 2020, 9, 1, 12, 0, 0, 0, 153 },
+        { 2020, 5, 30, 16, 51, 40, 1, 147 },
+        { 1920, 7, 5, 18, 8, 7, 1, 216 },
+        { 1920, 4, 26, 0, 32, 33, 0, 926 },
+        { 1920, 2, 24, 7, 39, 14, 0, 112 }
+    };
+    FILE *output = NULL;
+    output = fopen("output.txt", "wb");
+
+    if (output == NULL) {
+        printf("Error opening file");
+        exit(-3);
+    }
+    fwrite(a, sizeof(int), 48, output);
+    fclose(output);
+
+    char fileName[FILENAME_MAX];
+
+
+    while (flag > -1) {
+        flag = (getFileName(fileName)); // 2 при норм работе
+        if (flag != -2) {
+            flag = scanf("%f", &menu);
+            if (!flag || menu != (int)menu)
+                flag = -4;
+            else
+                flag = 0;
+        }
+        scanf("%*[^\n]");
+        getchar();
+        if (flag > -1) {
+            switch ( (int)menu ) {
+                case 0:
+                    flag = readBinaryFile(fileName, 1);
+                break;
+                case 1:
+                    flag = sort(fileName/*"output.txt"*/);
+                    break;
+                case 2:
+                    flag = addS_data(fileName);
+//                    flag = quest2(fileName);
+                    break;
+                case -1:
+                    flag = -1;
+                    break;
+            }
+        }
+        if (flag < -1) {
+            printf("n/a\n");
+            fflush(stdout);
+            flag = 0;
+        }
+    }
+    if (flag == -1)
+        flag = 0;
+
+    return flag;
+}
+
+int addS_data(char *fileName) {
+//    s_data info;
+    float c[8];
+    int cint[8];
+    int flag = 1;
+    for (int i = 0; i < 8 && flag; ++i) {
+        flag = scanf("%f", &c[i]);
+        if (!flag || c[i] != (int)c[i])
+            flag = 0;
+    }
+    if (flag) {
+        cint[0] = c[0];
+        cint[1] = c[1];
+        cint[2] = c[2];
+        cint[3] = c[3];
+        cint[4] = c[4];
+        cint[5] = c[5];
+        cint[6] = c[6];
+        cint[7] = c[7];
+    }
+    FILE *in = fopen(fileName, "a");
+    if (in && flag) {
+        fwrite(cint, 8, sizeof(int), in);
+        fclose(in);
+        printf("\n");
+        sort(fileName);
+    }
+    return !flag || !in;
+}
+
+int readBinaryFile(char *fileName, int printMode) {
+    FILE * in;
+    s_data mas;
+    int NOfArrow = -2;
+    in = fopen(fileName, "rb");
+    if (in) {
+        NOfArrow = 0;
+        while(fgetS_data(in, &mas)) {
+            NOfArrow++;
+            if (printMode)
+                printf("%d %d %d %d %d %d %d %d\n", mas.year, mas.month, mas.day, mas.hour, mas.minute, mas.second, mas.status, mas.key);
+    }
+    fclose(in);
+    }
+    return NOfArrow;
+}
+
+int getFileName(char *fileName) {
+    int flag = 2;
+    if (fgets(fileName, FILENAME_MAX, stdin) == NULL) {
+        flag = -2;
+    }
+    else {
+            /* Удаляем символ конца строки */
+            size_t last = strlen(fileName) - 1;
+//        printf("%c- last", fileName[last]);
+            if (fileName[last] == '\n')
+                fileName[last] = '\0';
+
+            /* Здесь можно проанализировать строку */
+    }
+    return flag;
+}
+
+
+
+int sort(char *fileName)
+{
+    int flag = 0;
+    s_data *mas = (s_data*)malloc(3 * sizeof(s_data));
+    FILE * in;
+    int NumberOfStrings = 0;
+    in = fopen(fileName, "rb+");
+    if(!in)
+    {
+//        perror("Error occured while opening file");
+        flag = -3;
+
+    } else {
+
+        NumberOfStrings = readBinaryFile(fileName, 0);
+
+        for (int i  = 0; i < NumberOfStrings; ++i) {
+            for (int j = NumberOfStrings - 1; j > i; --j) {
+                fseek(in, (j-1) * sizeof(s_data), SEEK_SET);
+                fgetS_data(in, &mas[1]);
+//                printf("\n1 - %d %d %d %d %d %d %d %d      i = %d     j = %d\n", mas[1].year, mas[1].month, mas[1].day, mas[1].hour, mas[1].minute, mas[1].second, mas[1].status, mas[1].key, i, j);
+                fgetS_data(in, &mas[2]);
+//                 printf("2 - %d %d %d %d %d %d %d %d     i = %d     j = %d\n", mas[2].year, mas[2].month, mas[2].day, mas[2].hour, mas[2].minute, mas[2].second, mas[2].status, mas[2].key, i , j);
+                fseek(in, (j-1) * sizeof(s_data), SEEK_SET);
+                if (comparisonS_data(&mas[1], &mas[2]) > 0) {
+//                    printf("==");
+                    fputS_data(in, &mas[2]);
+                    fputS_data(in, &mas[1]);
+                }
+           }
+       }
+       fseek(in, 0, SEEK_SET); // В начало
+//       while(fgetS_data(in, mas)) {
+//            printf("\n%d %d %d %d %d %d %d  %d\n", mas[0].year, mas[0].month, mas[0].day, mas[0].hour, mas[0].minute, mas[0].second, mas[0].status, mas[0].key);
+//       }
+       readBinaryFile(fileName, 1);
+        fclose(in);
+        free (mas);
+    }
+    return flag;
+}
+
+void copyS_data(s_data *in, s_data *out) {
+    in->year = out->year;
+    in->month = out->month;
+    in->day = out->day;
+    in->hour = out->hour;
+    in->minute = out->minute;
+    in->second = out->second;
+    in->status = out->status;
+    in->key = out->key;
+
+}
+
+int comparisonS_data(s_data *a, s_data *b) {
+    int answ = -1;
+    if (answ == -1) {
+        if (a->year > b->year) {
+            answ = 1;
+//            printf("%d > %d", a->year, b->year);
+        }
+        if (a->year < b->year) {
+            answ = 0;
+//            printf("%d < %d", a->year, b->year);
+        }
+     }
+    if (answ == -1) {
+        if (a->month > b->month) {
+            answ = 1;
+//            printf("%d > %d", a->month, b->month);
+        }
+        if (a->month < b->month) {
+            answ = 0;
+//            printf("%d > %d", a->month, b->month);
+        }
+    }
+    if (answ == -1) {
+        if (a->day > b->day) {
+            answ = 1;
+//            printf("%d > %d", a->day, b->day);
+        }
+        if (a->day < b->day) {
+            answ = 0;
+//            printf("%d > %d", a->day, b->day);
+        }
+    }
+    if (answ == -1) {
+        if (a->hour > b->hour) {
+            answ = 1;
+//            printf("%d > %d", a->hour, b->hour);
+        }
+        if (a->hour < b->hour) {
+            answ = 0;
+//            printf("%d > %d", a->hour, b->hour);
+        }
+    }
+    if (answ == -1) {
+        if (a->minute > b->minute) {
+            answ = 1;
+//            printf("%d > %d", a->minute, b->minute);
+        }
+        if (a->minute < b->minute) {
+            answ = 0;
+//            printf("%d > %d", a->minute, b->minute);
+        }
+    }
+    if (answ == -1) {
+        if (a->second > b->second) {
+            answ = 1;
+//            printf("%d > %d", a->second, b->second);
+        }
+        if (a->second < b->second) {
+            answ = 0;
+//            printf("%d > %d", a->second, b->second);
+        }
+    }
+    if (answ == -1) {
+        if (a->status > b->status) {
+            answ = 1;
+//            printf("%d > %d", a->status, b->status);
+        }
+        if (a->status < b->status) {
+            answ = 0;
+//            printf("%d > %d", a->status, b->status);
+        }
+    }
+    if (answ == -1) {
+        if (a->status > b->status) {
+            answ = 1;
+//            printf("%d > %d", a->status, b->status);
+        }
+        if (a->status < b->status) {
+            answ = 0;
+//            printf("%d > %d", a->status, b->status);
+        }
+    }
+    return answ;
+}
+
+int fgetS_data(FILE *in, s_data *info) {
+    int control_sum = 0;
+    int c[8];
+    control_sum = fread(c, sizeof(int), 8, in);
+    if (in && (control_sum == 8) ) {
+//        control_sum = fread(c, sizeof(int), 8, in);
+        info->year = c[0];
+        info->month = c[1];
+        info->day = c[2];
+        info->hour = c[3];
+        info->minute = c[4];
+        info->second = c[5];
+        info->status = c[6];
+        info->key = c[7];
+    }
+    if (control_sum != 8)
+        control_sum = 0;
+    return control_sum;
+}
+
+int fputS_data(FILE *in, s_data *out) {
+    int flag = 1;
+    if (in) {
+        fwrite(&out->year, sizeof(int), 1, in);
+        fwrite(&out->month, sizeof(int), 1, in);
+        fwrite(&out->day, sizeof(int), 1, in);
+        fwrite(&out->hour, sizeof(int), 1, in);
+        fwrite(&out->minute, sizeof(int), 1, in);
+        fwrite(&out->second, sizeof(int), 1, in);
+        fwrite(&out->status, sizeof(int), 1, in);
+        fwrite(&out->key, sizeof(int), 1, in);
+    } else {
+        flag = 0;
+    }
+
+    return flag;
+}
+
+
+//void readFromFile(FILE** in, int* count) {
+
+//    char str[10];
+//    while (fgets(str, 10, *in) != NULL) {
+//        printf("%s", str);
+//        (*count)++;
+//    }
+//}
+
+
